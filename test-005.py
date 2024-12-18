@@ -30,6 +30,7 @@ class CustomEventLoop(asyncio.AbstractEventLoop):
 		self.isRunning = True
 		while self.isRunning:
 			self.run_once()
+			# spinning hot on the CPU
 		asyncio._set_running_loop(None)
 
 	def _GetNow(self):
@@ -42,7 +43,7 @@ class CustomEventLoop(asyncio.AbstractEventLoop):
 		for timer in elapsed_timers:
 			timer._scheduled = False
 			if not timer._cancelled:
-				print("run_once: running an elapsed timer handler")
+				print("...step")
 				timer._run()
 
 	def close(self):
