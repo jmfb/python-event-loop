@@ -38,7 +38,6 @@ class CustomEventLoop(asyncio.BaseEventLoop):
 			name=repr(name) if name is not None else None,
 			context=context
 		)
-		task.set_result
 		self.tasks.put(task)
 		return task
 
