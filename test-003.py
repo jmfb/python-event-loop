@@ -57,3 +57,11 @@ asyncio.set_event_loop(loop)
 task = loop.create_task(MainAsync())
 loop.run_forever()
 print(f"Main result = {task.result()}")
+
+"""
+MainAsync-Enter
+Stepping
+Stepping
+MainAsync-Exit
+Main result = 1
+"""

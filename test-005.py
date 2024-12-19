@@ -88,3 +88,18 @@ async def MainAsync():
 	return 1
 
 asyncio.run(MainAsync(), loop_factory=CustomEventLoop)
+
+"""
+...step
+MainAsync-Enter
+...step
+...step
+...step
+MainAsync-Exit
+...step
+...step
+...step
+...step
+...step
+close
+"""
