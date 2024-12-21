@@ -33,10 +33,19 @@ class CoroutineProxy:
 		except StopIteration as exception:
 			return False, exception.value
 
+class TaskTimerHandle(asyncio.TimerHandle):
+	taskId = None
+
+	def __init__(self, taskId, when, callback, *args, loop, context):
+		self.taskId = taskId
+		super().__init__(when, callback, *args, loop=loop, context=context)
+
 class CustomEventLoop(asyncio.AbstractEventLoop):
 	timers = []
 	isRunning = False
 	clockResolution = time.get_clock_info('monotonic').resolution
+	nextTaskId = 1
+	currentTaskId = None
 
 	def stop(self):
 		self.isRunning = False
@@ -48,13 +57,15 @@ class CustomEventLoop(asyncio.AbstractEventLoop):
 		self.run_forever()
 		return future.result()
 
-
 	async def create_proxy(self, coro):
 		return await CoroutineProxy(coro)
 
 	def create_task(self, coro, *, name=None, context=None):
+		taskId = self.nextTaskId
+		self.nextTaskId += 1
 		proxy = self.create_proxy(coro)
 		print("create_task-before")
+		self.currentTaskId = taskId
 		task = asyncio.Task(
 			proxy,
 			loop=self,
@@ -62,6 +73,7 @@ class CustomEventLoop(asyncio.AbstractEventLoop):
 			context=context
 		)
 		print("create_task-after")
+		self.currentTaskId = None
 		return task
 
 	def run_forever(self):
@@ -86,7 +98,9 @@ class CustomEventLoop(asyncio.AbstractEventLoop):
 		for handle in elapsed_timers:
 			if not handle._cancelled:
 				print("handle_run-before")
+				self.currentTaskId = handle.taskId
 				handle._run()
+				self.currentTaskId = None
 				print("handle_run-after")
 
 	def close(self):
@@ -102,8 +116,15 @@ class CustomEventLoop(asyncio.AbstractEventLoop):
 		return self.call_at(self.GetWhen(delay), callback, *args, context=context)
 
 	def call_at(self, when, callback, *args, context=None):
-		print("call_at")
-		timer = asyncio.TimerHandle(when, callback, args, loop=self, context=context)
+		print(f"call_at taskId={self.currentTaskId}")
+		timer = TaskTimerHandle(
+			self.currentTaskId,
+			when,
+			callback,
+			args,
+			loop=self,
+			context=context
+		)
 		self.timers.append(timer)
 		timer._scheduled = True
 		return timer
