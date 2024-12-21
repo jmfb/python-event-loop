@@ -4,7 +4,8 @@ Python Event Loops
 
 ## References
 
-* [Python Coroutine Docs](https://docs.python.org/3/library/asyncio-task.html)
+* [Python Coroutine Docs (Library)](https://docs.python.org/3/library/asyncio-task.html)
+* [Python Coroutine Docs (Reference)](https://docs.python.org/3/reference/datamodel.html#coroutine-objects)
 * [Python Source Code](https://github.com/python/cpython)
 * [UVLoop](https://github.com/MagicStack/uvloop)
 

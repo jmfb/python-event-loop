@@ -20,13 +20,13 @@ class PerformanceTimer:
 
 	def Stop(self):
 		if not self.isRunning:
-			raise RuntimeError("Time is not running")
+			raise RuntimeError("Timer is not running")
 		self.isRunning = False
 		self.end = self.GetNowNs()
 
 	def GetDurationNs(self):
 		if self.start is None:
-			raise RuntimeError("Time was never started")
+			raise RuntimeError("Timer was never started")
 		end = self.GetNowNs() if self.end is None or self.isRunning else self.end
 		return end - self.start
 
